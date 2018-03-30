@@ -4,9 +4,12 @@ import App from './App'
 import router from './router'
 import fastclick from 'fastclick'
 import iView from 'iview'
+import Axios from 'axios'
 import 'common/stylus/index.styl'
 import 'iview/dist/styles/iview.css'
 Vue.use(iView)
+Vue.prototype.$axios = Axios
+Vue.prototype.HOST = '/api'
 Vue.config.productionTip = false
 fastclick.attach(document.body)
 /* eslint-disable no-new */

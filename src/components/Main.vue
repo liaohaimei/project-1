@@ -69,7 +69,8 @@
                                 <Icon type="ios-analytics"></Icon>
                                 案件协查
                             </template>
-                            <router-link tag="li" class="ivu-menu-item" name="4-1" to="/Investigation">案件协查</router-link>
+                            <router-link tag="li" class="ivu-menu-item" active-class="ivu-menu-item-active ivu-menu-item-selected" name="4-1" to="/Investigation">案件协查</router-link>
+                            <router-link tag="li" class="ivu-menu-item" active-class="ivu-menu-item-active ivu-menu-item-selected" name="4-2" to="/TestMusic">Music</router-link>
                         </Submenu>
                         <Submenu name="5">
                             <template slot="title">
