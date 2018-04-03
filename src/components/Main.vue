@@ -52,7 +52,7 @@
         vertical-align: middle;
         font-size: 22px;
     }
-    .sidebar-nav{ background-color: red; width: 100% }
+    .sidebar-nav{ background-color: #495060; width: 100%; color:#fff; }
     .sidebar-nav>ul li{ padding: 14px 24px; position: relative; }
 </style>
 <template>
@@ -71,9 +71,9 @@
                         </li>
                         <li><Icon type="ios-navigate"></Icon><span>案件协查</span>
                             <ul>
-                                <router-link tag="li" class="ivu-menu-item" active-class="ivu-menu-item-active ivu-menu-item-selected" name="4-1" to="/Investigation">案件协查</router-link>
-                                <router-link tag="li" class="ivu-menu-item" active-class="ivu-menu-item-active ivu-menu-item-selected" name="4-2" to="/TestMusic">Music</router-link>
-                                <router-link tag="li" class="ivu-menu-item" active-class="ivu-menu-item-active ivu-menu-item-selected" name="4-2" to="/TestMovie">Movie</router-link>
+                                <router-link tag="li" class="ivu-menu-item" active-class="ivu-menu-item-active ivu-menu-item-selected" name="4-1" :to="{name:'investigation'}">案件协查</router-link>
+                                <router-link tag="li" class="ivu-menu-item" active-class="ivu-menu-item-active ivu-menu-item-selected" name="4-2" :to="{name:'testMusic'}">Music</router-link>
+                                <router-link tag="li" class="ivu-menu-item" active-class="ivu-menu-item-active ivu-menu-item-selected" name="4-2" :to="{name:'testMovie'}">Movie</router-link>
                             </ul>
                         </li>
                     </ul>
@@ -108,9 +108,9 @@
                             <Icon type="ios-analytics"></Icon>
                             <span>案件协查</span>
                         </template>
-                        <router-link tag="li" class="ivu-menu-item" active-class="ivu-menu-item-active ivu-menu-item-selected" name="4-1" to="/Investigation">案件协查</router-link>
-                        <router-link tag="li" class="ivu-menu-item" active-class="ivu-menu-item-active ivu-menu-item-selected" name="4-2" to="/TestMusic">Music</router-link>
-                        <router-link tag="li" class="ivu-menu-item" active-class="ivu-menu-item-active ivu-menu-item-selected" name="4-2" to="/TestMovie">Movie</router-link>
+                        <router-link tag="li" class="ivu-menu-item" active-class="ivu-menu-item-active ivu-menu-item-selected" name="4-1" :to="{name:'investigation'}">案件协查</router-link>
+                        <router-link tag="li" class="ivu-menu-item" active-class="ivu-menu-item-active ivu-menu-item-selected" name="4-2" :to="{name:'testMusic'}">Music</router-link>
+                        <router-link tag="li" class="ivu-menu-item" active-class="ivu-menu-item-active ivu-menu-item-selected" name="4-2" :to="{name:'testMovie'}">Movie</router-link>
                     </Submenu>
                     <Submenu name="5">
                         <template slot="title">
@@ -127,9 +127,19 @@
             <Layout>
                 <Header :style="{padding: 0}" class="layout-header-bar">
                     <Icon @click.native="collapsedSider" :class="rotateIcon" :style="{margin: '13px 20px 0'}" type="navicon-round" size="24"></Icon>
+                    <Avatar icon="person" />
+                    <Dropdown>
+                            <a href="javascript:void(0)">
+                                {{username}}
+                                <Icon type="arrow-down-b"></Icon>
+                            </a>
+                            <DropdownMenu slot="list">
+                                <DropdownItem @click.native="loginOut">退出登录</DropdownItem>
+                            </DropdownMenu>
+                        </Dropdown>
                 </Header>
                 <Content :style="{margin: '20px', background: '#fff', minHeight: '260px'}">
-                    <router-view/>
+                    <router-view></router-view>
                 </Content>
             </Layout>
         </Layout>
@@ -142,8 +152,12 @@ import logoimg from 'common/image/logo.png'
             return {
                 isCollapsed: false,
                 //logoimg:require('../common/image/logo.png')
-                logoimg:logoimg
+                logoimg:logoimg,
+                username:false
             }
+        },
+        mounted(){
+           this.username = this.loginCheck() //获取登录用户名
         },
         computed: {
             rotateIcon () {
@@ -162,6 +176,26 @@ import logoimg from 'common/image/logo.png'
         methods: {
             collapsedSider () {
                 this.$refs.side1.toggleCollapse();
+            },
+            loginCheck(){ //检测用户登录状态
+                let _this = this
+                _this.username = false
+                let url = _this.HOST + "/member/check"
+                    _this.$axios.post(url).then(res => {
+                    _this.username = res.data.data.name
+                }).catch(error => {
+                    console.log(error)
+                })
+                return _this.username
+            },
+            loginOut(){//退出登录
+                let _this = this
+                let url = _this.HOST + "/member/logout"
+                    _this.$axios.post(url).then(res => {
+                    this.$router.push('/login') //跳转用户登录
+                }).catch(error => {
+                    console.log(error)
+                })
             }
         }
     }

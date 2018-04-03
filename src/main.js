@@ -7,7 +7,9 @@ import iView from 'iview'
 import Axios from 'axios'
 import 'common/stylus/index.styl'
 import 'iview/dist/styles/iview.css'
+import Cookies from 'js-cookie'
 Vue.use(iView)
+Vue.prototype.Cookies = Cookies
 Vue.prototype.$axios = Axios
 Vue.prototype.HOST = '/api'
 Vue.config.productionTip = false
