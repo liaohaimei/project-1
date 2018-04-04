@@ -182,17 +182,24 @@ import logoimg from 'common/image/logo.png'
                 _this.username = false
                 let url = _this.HOST + "/member/check"
                     _this.$axios.post(url).then(res => {
+                    if(res.data.status == 0){
                     _this.username = res.data.data.name
+                    _this.Cookies.set('isLogin',true)
+                    }else{
+                    _this.Cookies.set('isLogin',false)
+                    }
                 }).catch(error => {
                     console.log(error)
                 })
+
                 return _this.username
             },
             loginOut(){//退出登录
                 let _this = this
                 let url = _this.HOST + "/member/logout"
                     _this.$axios.post(url).then(res => {
-                    this.$router.push('/login') //跳转用户登录
+                    _this.Cookies.set('isLogin', false)
+                    _this.$router.push('/login') //跳转用户登录
                 }).catch(error => {
                     console.log(error)
                 })

@@ -8,6 +8,8 @@ import Axios from 'axios'
 import 'common/stylus/index.styl'
 import 'iview/dist/styles/iview.css'
 import Cookies from 'js-cookie'
+import base from './base'
+Vue.use(base)
 Vue.use(iView)
 Vue.prototype.Cookies = Cookies
 Vue.prototype.$axios = Axios

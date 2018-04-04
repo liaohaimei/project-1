@@ -35,6 +35,9 @@
                 }
             }
         },
+        mounted(){
+           this.checkLogin() //
+        },
         methods: {
             handleSubmit(name) {
                 let _this = this
@@ -47,15 +50,16 @@
                         _this.logining = false
                             if(res.data.status !== 0){
                                 _this.$Message.error('登录失败')
+                                _this.Cookies.set('isLogin', false)
                             }else{
-                            //_this.Cookies.set('username', _this.formInline.username)
-
-                            if(_this.$route.query.redirect) {
-                                _this.$router.push(_this.$route.query.redirect);
-                            } else {
-                                _this.$router.push('/main') //跳转用户中心页
-                            }
-                                _this.$Message.success('登录成功')
+                                if(_this.$route.query.redirect) {
+                                    _this.$router.push(_this.$route.query.redirect);
+                                } else {
+                                    _this.Cookies.set('isLogin', true)
+                                    _this.$Message.success('登录成功')
+                                    _this.$router.push('/main') //跳转用户中心页
+                                }
+                                
 
                             }
 
@@ -66,9 +70,22 @@
 
                        
                     } else {
+                        _this.Cookies.set('isLogin', false)
                         this.$Message.error('登录失败');
                     }
                 })
+            },
+            checkLogin(){
+                let _this = this
+                let url = _this.HOST + "/member/check"
+                    _this.$axios.post(url).then(res => {
+                    if(res.data.status == 0){
+                    this.$router.push('/main') //跳转用户登录
+                    }
+                }).catch(error => {
+                    console.log(error)
+                })
+
             }
         }
     }

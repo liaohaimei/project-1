@@ -5,11 +5,9 @@ import Login from 'components/Login'
 import Investigation from 'components/investigation/Investigation'
 import TestMusic from 'components/testmusic/TestMusic'
 import TestMovie from 'components/testmovie/TestMovie'
-
+import Cookies from 'js-cookie'
 Vue.use(Router)
-
-export default new Router({
-  routes: [
+const routes = [
     {
       path: '/',
       redirect: '/login'
@@ -22,14 +20,39 @@ export default new Router({
     {
       path: '/main',
       name: 'Main',
+      meta:{requireAuth: true },
       component: Main,
       children: [//子路由
         //{ path: '', redirect: 'Investigation' },//默认
-        { path: 'investigation',name: 'investigation', component: Investigation },//
-        { path: 'testMusic',name: 'testMusic', component: TestMusic },//
-        { path: 'testMovie',name: 'testMovie', component: TestMovie },//
+        { path: 'investigation',name: 'investigation', component: Investigation, meta:{requireAuth: true } },//
+        { path: 'testMusic',name: 'testMusic', component: TestMusic, meta:{requireAuth: true } },//
+        { path: 'testMovie',name: 'testMovie', component: TestMovie, meta:{requireAuth: true } },//
 
       ]
     }
   ]
+
+
+const router = new Router({
+  routes
 })
+
+
+router.beforeEach((to,from,next) => {
+
+  let isLogin = Cookies.get('isLogin')=='true' ? true : false
+  let logined_in = false
+  if(!logined_in && to.meta.requireAuth){
+    console.log(isLogin)
+    if(isLogin){
+      next()
+    }else{
+      next('/login')
+    }
+  }else{
+    next()
+  }
+})
+
+
+export default router
