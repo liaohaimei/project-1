@@ -117,7 +117,7 @@
                             <Icon type="ios-analytics"></Icon>
                             <span>管理</span>
                         </template>
-                        <MenuItem name="5-1">用户管理</MenuItem>
+                        <router-link tag="li" class="ivu-menu-item" active-class="ivu-menu-item-active ivu-menu-item-selected" name="5-1" :to="{name:'usergroup'}">用户列表</router-link>
                         <MenuItem name="5-2">通缉令预警管理</MenuItem>
                         <MenuItem name="5-3">短信管理</MenuItem>
                         <MenuItem name="5-4">用户配置</MenuItem>
@@ -156,7 +156,7 @@ import logoimg from 'common/image/logo.png'
                 username:false
             }
         },
-        mounted(){
+        created(){
            this.username = this.loginCheck() //获取登录用户名
         },
         computed: {
@@ -179,7 +179,7 @@ import logoimg from 'common/image/logo.png'
             },
             loginCheck(){ //检测用户登录状态
                 let _this = this
-                _this.username = false
+                _this.username = ''
                 let url = _this.HOST + "/member/check"
                     _this.$axios.post(url).then(res => {
                     if(res.data.status == 0){

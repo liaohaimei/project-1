@@ -18,7 +18,31 @@ Vue.config.productionTip = false
 fastclick.attach(document.body)
 /* eslint-disable no-new */
 new Vue({
-  el: '#app',
-  router,
-  render: h => h(App)
+	el: '#app',
+	router,
+	render: h => h(App),
+	//监听路由检查登录
+	watch:{
+		"$route" : 'checkLogin'
+	},
+	//进入页面时
+	created() {
+	 this.checkLogin();
+	},
+	methods:{
+		checkLogin(){
+		    let _this = this
+		    let url = _this.HOST + "/member/check"
+		        _this.$axios.post(url).then(res => {
+		        if(res.data.status == 0){
+		        	
+		        }else{
+		        	this.$router.push('/login') //跳转用户登录
+		        }
+		    }).catch(error => {
+		        console.log(error)
+		    })
+
+		}
+	}
 })

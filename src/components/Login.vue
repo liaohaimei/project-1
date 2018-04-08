@@ -35,8 +35,9 @@
                 }
             }
         },
-        mounted(){
-           this.checkLogin() //
+        //进入页面时
+        created() {
+         this.checkLogin();
         },
         methods: {
             handleSubmit(name) {

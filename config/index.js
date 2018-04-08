@@ -11,12 +11,12 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-        "/api":{
-         // target:"http://api.douban.com/v2",
-          target:"http://192.168.99.232/labs_cnns_2017sh",
+        '/api':{
+         // target:'http://api.douban.com/v2',
+          target:'http://192.168.99.232/labs_cnns_2017sh',
           changeOrigin:true,
           pathRewrite:{
-            "^/api":""
+            '^/api':''
           }
         }
     },

@@ -5,6 +5,7 @@ import Login from 'components/Login'
 import Investigation from 'components/investigation/Investigation'
 import TestMusic from 'components/testmusic/TestMusic'
 import TestMovie from 'components/testmovie/TestMovie'
+import Usergroup from 'components/user/usergroup'
 import Cookies from 'js-cookie'
 Vue.use(Router)
 const routes = [
@@ -27,6 +28,7 @@ const routes = [
         { path: 'investigation',name: 'investigation', component: Investigation, meta:{requireAuth: true } },//
         { path: 'testMusic',name: 'testMusic', component: TestMusic, meta:{requireAuth: true } },//
         { path: 'testMovie',name: 'testMovie', component: TestMovie, meta:{requireAuth: true } },//
+        { path: 'usergroup',name: 'usergroup', component: Usergroup, meta:{requireAuth: true } },//
 
       ]
     }
