@@ -9,6 +9,7 @@ import 'common/stylus/index.styl'
 import 'iview/dist/styles/iview.css'
 import Cookies from 'js-cookie'
 import base from './base'
+import store from './store'
 Vue.use(base)
 Vue.use(iView)
 Vue.prototype.Cookies = Cookies
@@ -20,6 +21,7 @@ fastclick.attach(document.body)
 new Vue({
 	el: '#app',
 	router,
+	store,//使用store
 	render: h => h(App),
 	//监听路由检查登录
 	watch:{

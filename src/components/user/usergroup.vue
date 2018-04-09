@@ -1,7 +1,9 @@
 <template>
     <div>
-      <Table :columns="historyColumns" :data="historyData"></Table>
-      <Page :total="dataCount" :page-size="pageSize" show-total class="paging" @on-change="changepage"></Page>
+		<Table :columns="historyColumns" :data="historyData"></Table>
+		<Page :total="dataCount" :page-size="pageSize" show-total class="paging" @on-change="changepage"></Page>
+      	<a href="javascript:;" @click="$store.dispatch('switch_dialog')">点击</a>
+    	<user-list></user-list>
     </div>
 </template>
 <style scoped>
@@ -11,8 +13,11 @@
   }
 </style>
 <script>
-
+import UserList from 'components/user/UserList'
     export default {
+    	components:{
+    		UserList
+    	},
         data () {
             return {
                 ajaxHistoryData:[],
@@ -68,21 +73,10 @@
                                     },
                                     on: {
                                         click: () => {
-                                            this.show(params.index)
+                                            this.showUserList(params.row.id)
                                         }
                                     }
-                                }, 'View'),
-                                h('Button', {
-                                    props: {
-                                        type: 'error',
-                                        size: 'small'
-                                    },
-                                    on: {
-                                        click: () => {
-                                            this.remove(params.index)
-                                        }
-                                    }
-                                }, 'Delete')
+                                }, '查看')
                             ]);
                         }    
 	                }
@@ -119,6 +113,7 @@
               var res = []
               for(var i=0;i<data.length;i++){
                 var resObj = {
+                  id:data[i].id,
                   group:data[i].group,
                   about:data[i].about
                 }
@@ -130,7 +125,14 @@
                 var _start = ( index - 1 ) * this.pageSize;
                 var _end = index * this.pageSize;
                 this.historyData = this.ajaxHistoryData.slice(_start,_end);
-            }
+            },
+	        showUserList(id){
+	        	this.$store.dispatch({
+	        		type: 'switch_dialog',
+	        		parm:id
+	        	})
+	        	this.$router.push('/main/userlist')
+	        }
         },
         created(){
              this.handleListApproveHistory();

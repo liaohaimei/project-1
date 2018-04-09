@@ -5,7 +5,8 @@ import Login from 'components/Login'
 import Investigation from 'components/investigation/Investigation'
 import TestMusic from 'components/testmusic/TestMusic'
 import TestMovie from 'components/testmovie/TestMovie'
-import Usergroup from 'components/user/usergroup'
+import UserGroup from 'components/user/UserGroup'
+import UserList from 'components/user/UserList'
 import Cookies from 'js-cookie'
 Vue.use(Router)
 const routes = [
@@ -28,7 +29,8 @@ const routes = [
         { path: 'investigation',name: 'investigation', component: Investigation, meta:{requireAuth: true } },//
         { path: 'testMusic',name: 'testMusic', component: TestMusic, meta:{requireAuth: true } },//
         { path: 'testMovie',name: 'testMovie', component: TestMovie, meta:{requireAuth: true } },//
-        { path: 'usergroup',name: 'usergroup', component: Usergroup, meta:{requireAuth: true } },//
+        { path: 'usergroup',name: 'usergroup', component: UserGroup, meta:{requireAuth: true } },//
+        { path: 'userlist',name: 'userlist', component: UserList, meta:{requireAuth: true } },//
 
       ]
     }
@@ -45,7 +47,6 @@ router.beforeEach((to,from,next) => {
   let isLogin = Cookies.get('isLogin')=='true' ? true : false
   let logined_in = false
   if(!logined_in && to.meta.requireAuth){
-    console.log(isLogin)
     if(isLogin){
       next()
     }else{

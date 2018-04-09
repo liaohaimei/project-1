@@ -58,10 +58,10 @@
 <template>
     <div class="layout">
         <Layout>
-            <Sider ref="side1" hide-trigger collapsible :collapsed-width="78" v-model="isCollapsed">
+            <Sider ref="side1" hide-trigger collapsible :collapsed-width="78" v-model="isCollapsed" >
                 <div class="layout-logo"><img :src="logoimg"/></div>
 
-                <div class="sidebar-nav">
+                <!-- <div class="sidebar-nav" >
                     <ul>
                         <li><Icon type="ios-navigate"></Icon><span>预警</span>
                             <ul>
@@ -77,8 +77,8 @@
                             </ul>
                         </li>
                     </ul>
-                </div>
-                <Menu active-name="4-1" theme="dark" width="auto" :class="menuitemClasses"  :open-names="['4']">
+                </div> -->
+                <Menu active-name="4-1" theme="dark" width="auto" :class="menuitemClasses"  :open-names="['4']" :style="{position: 'absolute', height: '100vh',  overflow: 'auto'}">
                     <Submenu name="1">
                         <template slot="title">
                             <Icon type="ios-navigate"></Icon>
@@ -125,7 +125,7 @@
                 </Menu>
             </Sider>
             <Layout>
-                <Header :style="{padding: 0}" class="layout-header-bar">
+                <Header :style="{padding: 0,position: 'fixed', zIndex:9, top:0, width:'100%'}" class="layout-header-bar">
                     <Icon @click.native="collapsedSider" :class="rotateIcon" :style="{margin: '13px 20px 0'}" type="navicon-round" size="24"></Icon>
                     <Avatar icon="person" />
                     <Dropdown>
@@ -138,7 +138,7 @@
                             </DropdownMenu>
                         </Dropdown>
                 </Header>
-                <Content :style="{margin: '20px', background: '#fff', minHeight: '260px'}">
+                <Content :style="{margin: '20px', marginTop:'70px', background: '#fff', minHeight: '260px'}">
                     <router-view></router-view>
                 </Content>
             </Layout>
