@@ -8,6 +8,7 @@ import TestMovie from 'components/testmovie/TestMovie'
 import UserGroup from 'components/user/UserGroup'
 import UserList from 'components/user/UserList'
 import Cookies from 'js-cookie'
+import store from '@/store/index'
 Vue.use(Router)
 const routes = [
     {
@@ -41,10 +42,12 @@ const router = new Router({
   routes
 })
 
-
 router.beforeEach((to,from,next) => {
-
-  let isLogin = Cookies.get('isLogin')=='true' ? true : false
+let localStorage = window.localStorage.getItem('isLogin')
+let isLogin = false
+if(localStorage){
+  isLogin = JSON.parse(localStorage).status===0 ? true : false
+}
   let logined_in = false
   if(!logined_in && to.meta.requireAuth){
     if(isLogin){

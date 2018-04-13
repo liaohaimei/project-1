@@ -78,7 +78,7 @@
                         </li>
                     </ul>
                 </div> -->
-                <Menu active-name="4-1" theme="dark" width="auto" :class="menuitemClasses"  :open-names="['4']" :style="{position: 'absolute', height: '100vh',  overflow: 'auto'}">
+                <Menu active-name="4-1" theme="dark" width="auto" :class="menuitemClasses"  :open-names="['4']">
                     <Submenu name="1">
                         <template slot="title">
                             <Icon type="ios-navigate"></Icon>
@@ -130,7 +130,7 @@
                     <Avatar icon="person" />
                     <Dropdown>
                             <a href="javascript:void(0)">
-                                {{username}}
+                               {{user}}
                                 <Icon type="arrow-down-b"></Icon>
                             </a>
                             <DropdownMenu slot="list">
@@ -146,6 +146,8 @@
     </div>
 </template>
 <script>
+import store from '@/store/index'
+import {mapState} from 'vuex'
 import logoimg from 'common/image/logo.png'
     export default {
         data () {
@@ -157,9 +159,15 @@ import logoimg from 'common/image/logo.png'
             }
         },
         created(){
-           this.username = this.loginCheck() //获取登录用户名
+           //this.username = this.loginCheck() //获取登录用户名
         },
-        computed: {
+        computed:{
+            user(){
+                let localStorage = window.localStorage.getItem('isLogin')
+                if(localStorage){
+                  return JSON.parse(localStorage).data.name
+                }
+            },
             rotateIcon () {
                 return [
                     'menu-icon',
@@ -177,28 +185,11 @@ import logoimg from 'common/image/logo.png'
             collapsedSider () {
                 this.$refs.side1.toggleCollapse();
             },
-            loginCheck(){ //检测用户登录状态
-                let _this = this
-                _this.username = ''
-                let url = _this.HOST + "/member/check"
-                    _this.$axios.post(url).then(res => {
-                    if(res.data.status == 0){
-                    _this.username = res.data.data.name
-                    _this.Cookies.set('isLogin',true)
-                    }else{
-                    _this.Cookies.set('isLogin',false)
-                    }
-                }).catch(error => {
-                    console.log(error)
-                })
-
-                return _this.username
-            },
             loginOut(){//退出登录
                 let _this = this
                 let url = _this.HOST + "/member/logout"
                     _this.$axios.post(url).then(res => {
-                    _this.Cookies.set('isLogin', false)
+                    window.localStorage.removeItem('isLogin')
                     _this.$router.push('/login') //跳转用户登录
                 }).catch(error => {
                     console.log(error)

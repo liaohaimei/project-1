@@ -25,7 +25,7 @@ new Vue({
 	render: h => h(App),
 	//监听路由检查登录
 	watch:{
-		"$route" : 'checkLogin'
+		//"$route" : 'checkLogin'
 	},
 	//进入页面时
 	created() {

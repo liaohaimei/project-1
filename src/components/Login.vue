@@ -11,11 +11,12 @@
             </Input>
         </FormItem>
         <FormItem>
-            <Button type="primary" @click="handleSubmit('formInline')">登录</Button>
+            <Button type="primary" @click="login('formInline')">登录</Button>
         </FormItem>
     </Form>
 </template>
 <script>
+import {mapState} from 'vuex'
     export default {
         data () {
             return {
@@ -35,32 +36,42 @@
                 }
             }
         },
+        computed:{
+            user(){
+                let localStorage = window.localStorage.getItem('isLogin')
+                if(localStorage){
+                  return JSON.parse(localStorage).data.name
+                }
+            }
+        },
         //进入页面时
         created() {
-         this.checkLogin();
+            if(this.user){
+              this.$router.push('/main')  
+            }
         },
         methods: {
-            handleSubmit(name) {
+            login(name){
                 let _this = this
                 _this.$refs[name].validate((valid) => {
                     if (valid) {
-                        _this.logining = true
                         let url = _this.HOST + "/member/login"
                         _this.$axios.post(url,_this.formInline)
                         .then(res => {
-                        _this.logining = false
-                            if(res.data.status !== 0){
-                                _this.$Message.error('登录失败')
-                                _this.Cookies.set('isLogin', false)
+                            //console.log(res.data)
+                            if(res.data.status == 0){
+                                _this.$Message.success('登录成功')
+                                _this.$store.dispatch({
+                                    type: 'switch_dialog',
+                                    isLogin:res.data
+                                })
+                                _this.username=''
+                                _this.password=''
+                                _this.$router.push('/main')
                             }else{
-                                if(_this.$route.query.redirect) {
-                                    _this.$router.push(_this.$route.query.redirect);
-                                } else {
-                                    _this.Cookies.set('isLogin', true)
-                                    _this.$Message.success('登录成功')
-                                    _this.$router.push('/main') //跳转用户中心页
-                                }
-                                
+                                _this.$Message.error('登录失败')
+                                _this.username=''
+                                _this.password=''
 
                             }
 
@@ -71,23 +82,11 @@
 
                        
                     } else {
-                        _this.Cookies.set('isLogin', false)
-                        this.$Message.error('登录失败');
+                        _this.$Message.error('登录失败');
                     }
                 })
-            },
-            checkLogin(){
-                let _this = this
-                let url = _this.HOST + "/member/check"
-                    _this.$axios.post(url).then(res => {
-                    if(res.data.status == 0){
-                    this.$router.push('/main') //跳转用户登录
-                    }
-                }).catch(error => {
-                    console.log(error)
-                })
-
             }
+            
         }
     }
 </script>

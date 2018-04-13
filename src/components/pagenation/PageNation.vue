@@ -1,212 +1,224 @@
 <template>
-    <ul class="mo-paging">
-        <!-- prev -->
-        <li
-        :class="['paging-item', 'paging-item--prev', {'paging-item--disabled' : index === 1}]"
-        @click="prev">prev</li>
-        
-        <!-- first -->
-        <li
-        :class="['paging-item', 'paging-item--first', {'paging-item--disabled' : index === 1}]"
-        @click="first">first</li>
-        
-        <li
-        :class="['paging-item', 'paging-item--more']"
-        v-if="showPrevMore">...</li>
-
-        <li
-        :class="['paging-item', {'paging-item--current' : index === pager}]"
-        v-for="pager in pagers"
-        @click="go(pager)">{{ pager }}</li>
-
-        <li
-        :class="['paging-item', 'paging-item--more']"
-        v-if="showNextMore">...</li>
-        
-        <!-- last -->
-        <li
-        :class="['paging-item', 'paging-item--last', {'paging-item--disabled' : index === pages}]"
-        @click="last">last</li>
-
-        <!-- next -->
-        <li
-        :class="['paging-item', 'paging-item--next', {'paging-item--disabled' : index === pages}]"
-        @click="next">next</li>
-    </ul>
+    <div class="pagenation">
+        <ul :class="theme">
+            <li class="btn" @click="first">{{ btnTxt[0] }}</li>
+            <li class="btn" @click="prev">{{ btnTxt[1] }}</li>
+            <li v-for="(page,index) in show_page_numbers" :class="{num:true,active:page==pageIndex}" :key="index" @click="setCurrent(page)">{{ page }}</li>
+            <li class="btn" @click="next">{{ btnTxt[2] }}</li>
+            <li class="btn" @click="last">{{ btnTxt[3] }}</li>
+        </ul>
+        <div v-show="needGoto" class="goto-area">
+            <span class="til-txt">第&nbsp;<b>{{ pageIndex }}</b>&nbsp;页</span>
+            <input type="text" class="page-input" v-model="targetPage"/>
+            <span class="goto-btn" @click="goto">{{ btnTxt[4] }}</span>
+        </div>
+    </div>
 </template>
-<script>
-export default {
-    name : 'PageNation',
-    //通过props来接受从父组件传递过来的值
-    props : {
 
-        //页面中的可见页码，其他的以...替代, 必须是奇数
-        perPages : { 
-            type : Number,
-            default : 5 
-        },
-
-        //当前页码
-        pageIndex : {
-            type : Number,
-            default : 1
-        },
-
-        //每页显示条数
-        pageSize : {
-            type : Number,
-            default : 10
-        },
-
-        //总记录数
-        total : {
-            type : Number,
-            default : 1
-        },
-
-    },
-    methods : {
-        prev(){
-            if (this.index > 1) {
-                this.go(this.index - 1)
-            }
-        },
-        next(){
-            if (this.index < this.pages) {
-                this.go(this.index + 1)
-            }
-        },
-        first(){
-            if (this.index !== 1) {
-                this.go(1)
-            }
-        },
-        last(){
-            if (this.index != this.pages) {
-                this.go(this.pages)
-            }
-        },
-        go (page) {
-            if (this.index !== page) {
-                this.index = page
-                //父组件通过change方法来接受当前的页码
-                this.$emit('change', this.index)
-            }
+<script type="text/javascript">
+  export default {
+    name: 'pagenation',
+    props: {
+      btnTxt: {
+        type: Array,
+        default: function(){
+          return ['首页','上一页','下一页','尾页','转到']
         }
-    },
-    computed : {
-
-        //计算总页码
-        pages(){
-            return Math.ceil(this.size / this.limit)
-        },
-
-        //计算页码，当count等变化时自动计算
-        pagers () {
-            const array = []
-            const perPages = this.perPages
-            const pageCount = this.pages
-            let current = this.index
-            const _offset = (perPages - 1) / 2
-
-            
-            const offset = {
-                start : current - _offset,
-                end   : current + _offset
-            }
-
-            //-1, 3
-            if (offset.start < 1) {
-                offset.end = offset.end + (1 - offset.start)
-                offset.start = 1
-            }
-            if (offset.end > pageCount) {
-                offset.start = offset.start - (offset.end - pageCount)
-                offset.end = pageCount
-            }
-            if (offset.start < 1) offset.start = 1
-
-            this.showPrevMore = (offset.start > 1)
-            this.showNextMore = (offset.end < pageCount)
-
-            for (let i = offset.start; i <= offset.end; i++) {
-                array.push(i)
-            }
-
-            return array
-        }
+      },
+      needGoto: {
+        type:Boolean,
+        default: false
+      },
+      theme: {
+        type: String,
+        default: 'theme-info'
+      },
+      limit: {
+        type: Number,
+        default:8
+      },
+      current: {
+        type: Number,
+        default: 1
+      },
+      total: {
+        type: Number
+      },
+      currentChange: {
+        type: Function
+      }
     },
     data () {
-        return {
-            index : this.pageIndex, //当前页码
-            limit : this.pageSize, //每页显示条数
-            size : this.total || 1, //总记录数
-            showPrevMore : false,
-            showNextMore : false
-        }
+      return {
+        pageIndex: this.current,
+        show_page_numbers: [],
+        targetPage: ''
+      }
     },
-    watch : {
-        pageIndex(val) {
-            this.index = val || 1
-        },
-        pageSize(val) {
-            this.limit = val || 10
-        },
-        total(val) {
-            this.size = val || 1
+    mounted () {
+      this.refresh()
+    },
+    methods: {
+      refresh () {
+        if(this.total <= this.limit){
+          this.show_page_numbers = this.createArr(1, this.total)
+          return
         }
+        let begin = this.pageIndex - 3
+        let end = this.pageIndex +3
+        begin = Math.max(begin, 1)
+        end = Math.max(end, this.limit)
+        begin = Math.min(begin, this.total-this.limit)
+        end = Math.min(end, this.total)
+        this.show_page_numbers = this.createArr(begin, end)
+        this.currentChange(this.pageIndex)
+      },
+      createArr (start,end) {
+        let arr = []
+        for (let i=start;i<=end;i++) {
+          arr.push(i)
+        }
+        return arr
+      },
+      first () {
+        let pageNow = this.pageIndex
+        if(pageNow > 1){
+          this.setCurrent(1)
+        }
+      },
+      prev () {
+        let pageNow = this.pageIndex
+        if(pageNow > 1){
+           this.setCurrent(pageNow-1)
+        }
+      },
+      next () {
+        let pageNow = this.pageIndex
+        if(pageNow < this.total){
+          this.setCurrent(pageNow+1)
+        }
+      },
+      last () {
+        let pageNow = this.pageIndex
+        if(pageNow < this.total){
+          this.setCurrent(this.total)
+        }
+      },
+      goto () {
+        if(this.targetPage<= this.total){
+            this.setCurrent(this.targetPage*1)
+        }else{
+          alert("页码超限")
+        }
+      },
+      setCurrent (index) {
+        this.pageIndex = index
+        this.refresh()
+      }
     }
-}	
+  }
 </script>
-<style scoped lang="stylus" rel="stylesheet/stylus">
-.mo-paging {
-    display: inline-block;
-    padding: 0;
-    margin: 1rem 0;
-    font-size: 0;
-    list-style: none;
-    user-select: none;
-    > .paging-item {
-        display: inline;
-        font-size: 14px;
-        position: relative;
-        padding: 6px 12px;
-        line-height: 1.42857143;
-        text-decoration: none;
-        border: 1px solid #ccc;
-        background-color: #fff;
-        margin-left: -1px;
-        cursor: pointer;
-        color: #0275d8;
-        &:first-child {
-            margin-left: 0;
-        }
-        &:hover {
-            background-color: #f0f0f0;
-            color: #0275d8;
-        }
-        &.paging-item--disabled,
-        &.paging-item--more{
-            background-color: #fff;
-            color: #505050;
-        }
-        /* 禁用 */
-        &.paging-item--disabled {
-            cursor: not-allowed;
-            opacity: .75;
-        }
-        &.paging-item--more,
-        &.paging-item--current {
-            cursor: default;
-        }
-        /* 选中 */
-        &.paging-item--current {
-            background-color: #0275d8;
-            color:#fff;
-            position: relative;
-            z-index: 1;
-            border-color: #0275d8;
-        }
-    }
-}   
+
+<style>
+  .pagenation {
+    padding:20px 0;
+    text-align:center;
+  }
+  .pagenation ul {
+    display:inline-block;
+  }
+  .pagenation ul:after {
+    clear:both;
+    content:"";
+    display:block;
+    width:0;
+  }
+  .pagenation ul li {
+    display:inline-block;
+    float:left;
+    color:#808080;
+    margin-right:5px;
+    font-size:14px;
+    line-height:1;
+    border-radius:5px;
+  }
+  .pagenation ul li.btn {
+    padding:7px 10px;
+  }
+  .pagenation ul li.num {
+    width:30px;
+    height:30px;
+    text-align:center;
+    line-height:30px;
+  }
+  .goto-area{
+    display:inline-block;
+    vertical-align:top;
+  }
+  .goto-area .til-txt{
+    color:#808080;
+    font-size:12px;
+  }
+  .goto-area b{
+    font-size:12px;
+    color:#ff3333;
+  }
+  .goto-area input{
+    outline:none;
+    appearance:none;
+    boder:1px solid #ccc;
+    margin-left:5px;
+    margin-right:5px;
+    width:30px;
+    height:30px;
+    text-align:center;
+  }
+  .goto-area .goto-btn{
+    display:inline-block;
+    font-size:14px;
+    padding:5px;
+    color:#fff;
+    border-radius:5px;
+  }
+  /* 定义分页主题颜色 */
+  .pagenation .theme-info li{
+    border:1px solid #188cff;
+  }
+  .pagenation .theme-info li.active {
+    color:#fff;
+    background-color:#188cff;
+  }
+  .pagenation .theme-info + div .goto-btn{
+    background-color:#188cff;
+  }
+  .pagenation .theme-danger li{
+    border:1px solid #fb6a36;
+  }
+  .pagenation .theme-danger li.active {
+    color:#fff;
+    background-color:#fb6a36;
+  }
+  .pagenation .theme-danger + div .goto-btn{
+    background-color:#fb6a36;
+  }
+  .pagenation .theme-success li{
+    border:1px solid #27b981;
+  }
+  .pagenation .theme-success li.active {
+    color:#fff;
+    background-color:#27b981;
+  }
+  .pagenation .theme-success + div .goto-btn{
+    background-color:#27b981;
+  }
+  .pagenation .theme-warning li{
+    border:1px solid #ccba09;
+  }
+  .pagenation .theme-warning li.active {
+    color:#fff;
+    background-color:#ccba09;
+  }
+  .pagenation .theme-warning + div .goto-btn{
+    background-color:#ccba09;
+  }
 </style>

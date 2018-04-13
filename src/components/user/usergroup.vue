@@ -2,8 +2,6 @@
     <div>
 		<Table :columns="historyColumns" :data="historyData"></Table>
 		<Page :total="dataCount" :page-size="pageSize" show-total class="paging" @on-change="changepage"></Page>
-      	<a href="javascript:;" @click="$store.dispatch('switch_dialog')">点击</a>
-    	<user-list></user-list>
     </div>
 </template>
 <style scoped>
@@ -13,11 +11,8 @@
   }
 </style>
 <script>
-import UserList from 'components/user/UserList'
+
     export default {
-    	components:{
-    		UserList
-    	},
         data () {
             return {
                 ajaxHistoryData:[],
@@ -73,7 +68,7 @@ import UserList from 'components/user/UserList'
                                     },
                                     on: {
                                         click: () => {
-                                            this.showUserList(params.row.id)
+                                            this.showUserList(params.row)
                                         }
                                     }
                                 }, '查看')
@@ -126,10 +121,10 @@ import UserList from 'components/user/UserList'
                 var _end = index * this.pageSize;
                 this.historyData = this.ajaxHistoryData.slice(_start,_end);
             },
-	        showUserList(id){
+	        showUserList(row){
 	        	this.$store.dispatch({
-	        		type: 'switch_dialog',
-	        		parm:id
+	        		type: 'userlist_dialog',
+	        		parm:row
 	        	})
 	        	this.$router.push('/main/userlist')
 	        }
